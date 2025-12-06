@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>WorldStream – Short News, Smart Feed</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Inshorts-style short updates for any topic you care about." />
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- External CSS -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- TOP NAV -->
+  <header class="top-nav">
+    <div class="logo">
+      <!-- Your logo image -->
+      <img src="Logo.png" alt="WorldStream logo" class="logo-icon-img" />
+      <span class="logo-text">WorldStream</span>
+    </div>
+
+    <nav class="nav-links">
+      <button class="nav-btn nav-btn-primary">Trending</button>
+      <button class="nav-btn">For You</button>
+      <button class="nav-btn">Saved</button>
+    </nav>
+  </header>
+
+  <!-- TOPIC BAR -->
+  <section class="topic-bar">
+    <div class="topic-scroll">
+      <button class="topic-pill topic-pill-active">All</button>
+      <button class="topic-pill">Technology</button>
+      <button class="topic-pill">Startups</button>
+      <button class="topic-pill">Sports</button>
+      <button class="topic-pill">Markets</button>
+      <button class="topic-pill">Science</button>
+      <button class="topic-pill">Entertainment</button>
+    </div>
+  </section>
+
+  <!-- SEARCH -->
+  <section class="search-wrap">
+    <input
+      type="text"
+      class="search-input"
+      id="searchInput"
+      placeholder="Search topic... e.g. AI, Cricket, IPOs"
+    />
+  </section>
+
+  <!-- MAIN FEED -->
+  <main class="feed" id="feed">
+    <!-- This placeholder will be replaced by JS -->
+    <article class="news-card news-card-placeholder">
+      <div class="news-content">
+        <h2 class="news-title">Loading your personalised short news feed...</h2>
+        <p class="news-body">
+          We’re fetching trending stories based on your selected topic. This will be replaced
+          with real cards once the data loads.
+        </p>
+        <div class="news-footer">
+          <span class="news-meta">Frontend · Static placeholder</span>
+          <span class="news-readmore">powered by <strong>WorldStream</strong></span>
+        </div>
+      </div>
+    </article>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="app-footer">
+    <span>© <span id="year"></span> WorldStream · Short, smart updates.</span>
+  </footer>
+
+  <!-- JS at the end so DOM is loaded first -->
+  <script src="app.js"></script>
+</body>
+</html>

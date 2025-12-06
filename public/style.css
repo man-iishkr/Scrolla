@@ -1,0 +1,258 @@
+:root {
+  --bg: #f3f4f6;
+  --card-bg: #ffffff;
+  --primary: #1565c0;
+  --primary-soft: #e3f2fd;
+  --text-main: #111827;
+  --text-muted: #6b7280;
+  --border-subtle: #e5e7eb;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  color: var(--text-main);
+}
+
+/* Top navigation like a simple app bar */
+.top-nav {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #ffffff;
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 0.6rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* HEADER LOGO */
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* Banner-style logo */
+.logo-icon-img {
+  height: 42px;          /* controls overall logo size */
+  width: auto;           /* keep aspect ratio */
+  object-fit: contain;   /* no distortion */
+  display: block;
+}
+
+/* We already have text inside the image, so hide extra text span */
+.logo-text {
+  font-weight: 600;
+  font-size: 0.95rem;
+  display: none;         /* hide to avoid duplicate "WorldStream" text */
+}
+
+/* Optional: slightly smaller logo on mobile */
+@media (max-width: 640px) {
+  .logo-icon-img {
+    height: 32px;
+  }
+}
+.nav-links {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.nav-btn {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  color: var(--text-muted);
+}
+
+.nav-btn-primary {
+  background: var(--primary-soft);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* Horizontal topic bar – scrollable on mobile */
+.topic-bar {
+  background: #ffffff;
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 0.4rem 0.6rem;
+}
+
+.topic-scroll {
+  display: flex;
+  gap: 0.4rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.topic-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.topic-pill {
+  white-space: nowrap;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-subtle);
+  background: #f9fafb;
+  font-size: 0.7rem;
+  cursor: pointer;
+  color: var(--text-muted);
+}
+
+.topic-pill-active {
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+}
+
+/* Search bar */
+.search-wrap {
+  background: #ffffff;
+  padding: 0.6rem 1rem 0.8rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.5rem 0.8rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-subtle);
+  font-size: 0.8rem;
+}
+
+/* Feed container similar to Inshorts (centered narrow column) */
+.feed {
+  max-width: 640px;
+  margin: 0.75rem auto 3rem;
+  padding: 0 0.75rem;
+}
+
+/* News card styling */
+.news-card {
+  background: var(--card-bg);
+  border-radius: 0.8rem;
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+  margin-bottom: 0.9rem;
+}
+
+.news-image-wrap {
+  width: 100%;
+  height: 210px;
+  overflow: hidden;
+}
+
+.news-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.news-content {
+  padding: 0.8rem 0.85rem 0.75rem;
+}
+
+.news-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+
+.news-body {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin-bottom: 0.5rem;
+}
+
+.news-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  font-size: 0.72rem;
+}
+
+.news-meta {
+  color: var(--text-muted);
+}
+
+.news-readmore {
+  color: var(--primary);
+}
+
+/* Placeholder card style */
+.news-card-placeholder {
+  border-style: dashed;
+  background: #f9fafb;
+}
+
+/* Footer */
+.app-footer {
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  padding: 0.8rem 0;
+  border-top: 1px solid var(--border-subtle);
+  background: #ffffff;
+  position: sticky;
+  bottom: 0;
+}
+
+/* Desktop tweaks */
+@media (min-width: 768px) {
+  .top-nav {
+    padding-inline: 2rem;
+  }
+
+  .search-wrap {
+    padding-inline: 2rem;
+  }
+
+  .topic-bar {
+    padding-inline: 2rem;
+  }
+
+  .feed {
+    padding-inline: 0;
+  }
+}
+
+/* Make card links nice */
+.news-card a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.news-title-link:hover,
+.news-readmore-link:hover {
+  text-decoration: underline;
+}
+
+.news-image-link {
+  display: block;
+}
+
+.news-card {
+  cursor: default;
+}
+
+.news-card .news-title-link {
+  cursor: pointer;
+}
+
+
