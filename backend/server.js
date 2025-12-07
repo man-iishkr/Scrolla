@@ -1,4 +1,10 @@
 // backend/server.js
+const mongoose = require("mongoose");
+const authRoutes = require("./routes/Authroutes");
+const userRoutes = require("./routes/userRoutes");
+
+
+
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
@@ -16,10 +22,21 @@ if (!NEWSAPI_KEY) {
 
 app.use(cors());
 app.use(express.json());
+// ✅ CONNECT TO MONGODB
+mongoose
+  .connect(process.env.MONGODB_URI)
+  .then(() => console.log("✅ MongoDB Connected"))
+  .catch((err) => console.error("❌ Mongo Error:", err));
+
 
 // Serve frontend from ../public
 const publicPath = path.join(__dirname, "..", "public");
 app.use(express.static(publicPath));
+// ✅ AUTH ROUTES
+app.use("/api/auth", authRoutes);
+app.use("/api/user", userRoutes);
+
+
 
 /**
  * Map UI topic to:
@@ -81,13 +98,14 @@ function mapTopicToEverythingParams(topic) {
 /**
  * Call NewsAPI /v2/everything with our tuned params.
  */
-async function callNewsApiEverything({ q, domains, pageSize }) {
+async function callNewsApiEverything({ q, domains, pageSize,page }) {
   if (!NEWSAPI_KEY) throw new Error("Missing NEWSAPI_KEY");
 
   const url = new URL("https://newsapi.org/v2/everything");
   url.searchParams.set("language", NEWSAPI_LANGUAGE);
   url.searchParams.set("sortBy", "publishedAt");
   url.searchParams.set("pageSize", String(pageSize || 20));
+  url.searchParams.set("page", String(page || 1)); 
   if (q && q.trim()) url.searchParams.set("q", q.trim());
   if (domains && domains.trim()) url.searchParams.set("domains", domains.trim());
 
@@ -120,6 +138,7 @@ app.get("/api/feed", async (req, res) => {
     const topic = req.query.topic || "All";
     const userSearch = (req.query.q || "").trim();
     const limit = Number(req.query.limit) || 20;
+    const page = Number(req.query.page) || 1;
 
     const { q: baseQ, domains } = mapTopicToEverythingParams(topic);
 
@@ -129,7 +148,8 @@ app.get("/api/feed", async (req, res) => {
     let articles = await callNewsApiEverything({
       q: mergedQ,
       domains,
-      pageSize: limit
+      pageSize: limit,
+      page
     });
 
     // Fallback: if still empty, try without domains
@@ -138,7 +158,8 @@ app.get("/api/feed", async (req, res) => {
       articles = await callNewsApiEverything({
         q: mergedQ,
         domains: "",
-        pageSize: limit
+        pageSize: limit,
+        page
       });
     }
 

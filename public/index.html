@@ -14,19 +14,26 @@
 </head>
 <body>
   <!-- TOP NAV -->
-  <header class="top-nav">
-    <div class="logo">
-      <!-- Your logo image -->
-      <img src="Logo.png" alt="WorldStream logo" class="logo-icon-img" />
-      <span class="logo-text">WorldStream</span>
-    </div>
+<header class="top-nav">
+  <div class="logo">
+    <img src="/Logo.png" alt="WorldStream logo" class="logo-icon-img" />
+  </div>
 
+  <div class="top-nav-right">
     <nav class="nav-links">
-      <button class="nav-btn nav-btn-primary">Trending</button>
-      <button class="nav-btn">For You</button>
-      <button class="nav-btn">Saved</button>
+      <button class="nav-btn nav-btn-primary" data-view="trending">Trending</button>
+      <button class="nav-btn" data-view="foryou">For You</button>
+      <button class="nav-btn" data-view="saved">Saved</button>
     </nav>
-  </header>
+
+    <button id="authUserBtn" class="nav-user-btn">
+      Sign in
+    </button>
+  </div>
+</header>
+
+
+
 
   <!-- TOPIC BAR -->
   <section class="topic-bar">
@@ -74,7 +81,34 @@
     <span>© <span id="year"></span> WorldStream · Short, smart updates.</span>
   </footer>
 
+  
+    <!-- AUTH POPUP -->
+  <div id="auth-modal" class="auth-modal-backdrop hidden">
+    <div class="auth-modal">
+      <h2 class="auth-modal-title">Welcome to WorldStream</h2>
+      <p class="auth-modal-text">
+        Login or create a free account to save stories and get a personalised <strong>For You</strong> feed.
+      </p>
+
+      <div class="auth-modal-actions">
+        <button id="authLoginBtn" class="auth-modal-btn auth-modal-btn-primary">
+          Login
+        </button>
+        <button id="authRegisterBtn" class="auth-modal-btn">
+          Register
+        </button>
+      </div>
+
+      <button id="authSkipBtn" class="auth-modal-skip">
+        Continue as guest
+      </button>
+    </div>
+  </div>
+  <!-- END AUTH POPUP -->
+
   <!-- JS at the end so DOM is loaded first -->
   <script src="app.js"></script>
 </body>
 </html>
+
+

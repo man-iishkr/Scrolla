@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Login | WorldStream</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="auth-page">
+  <div class="auth-box">
+    <h2>Login</h2>
+
+    <input type="email" id="email" placeholder="Email" />
+
+    <!-- Password with toggle -->
+    <div class="password-field">
+      <input type="password" id="password" placeholder="Password" />
+      <button
+        type="button"
+        class="toggle-password"
+        data-target="password"
+      >
+        Show
+      </button>
+    </div>
+
+    <button class="auth-submit-btn" onclick="login()">Login</button>
+
+    <p>Don't have an account? <a href="register.html">Register</a></p>
+  </div>
+
+  <script src="auth.js"></script>
+</body>
+
+
+</html>

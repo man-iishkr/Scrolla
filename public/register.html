@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Register | WorldStream</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="auth-page">
+  <div class="auth-box">
+    <h2>Register</h2>
+
+    <input type="text" id="name" placeholder="Full Name" />
+    <input type="email" id="email" placeholder="Email" />
+
+    <!-- Password with toggle -->
+    <div class="password-field">
+      <input type="password" id="password" placeholder="Password" />
+      <button
+        type="button"
+        class="toggle-password"
+        data-target="password"
+      >
+        Show
+      </button>
+    </div>
+
+    <!-- Strength meter -->
+    <div class="password-strength">
+      <div class="password-strength-bar" id="passwordStrengthBar"></div>
+      <span class="password-strength-label" id="passwordStrengthLabel">
+        Password strength
+      </span>
+    </div>
+
+    <!-- MAIN SUBMIT BUTTON HAS ITS OWN CLASS -->
+    <button class="auth-submit-btn" onclick="register()">Register</button>
+
+    <p>Already have an account? <a href="login.html">Login</a></p>
+  </div>
+
+  <script src="auth.js"></script>
+</body>
+
+
+</html>
