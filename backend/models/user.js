@@ -24,9 +24,17 @@ const userSchema = new mongoose.Schema(
     },
 
     readingHistory: {
-      type: Map,
-      of: Number,
-      default: {}
+      type: [
+        {
+          url: String,
+          title: String,
+          category: String,
+          topic: String,
+          sourceLabel: String,
+          clickedAt: { type: Date, default: Date.now }
+        }
+      ],
+      default: []
     }
   },
   { timestamps: true }

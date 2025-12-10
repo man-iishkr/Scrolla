@@ -21,6 +21,8 @@ function getCurrentUser() {
 let currentMode = "trending"; // "trending" | "foryou" | "saved"
 let currentTopic = "All";
 let allItems = [];
+let userProfile = null; // AI interest profile from backend
+
 
 const PAGE_SIZE = 12; // how many per page from backend
 
@@ -36,21 +38,41 @@ const LOCAL_KEY_SAVED_ITEMS = "ws_saved_items";
 function buildFeedUrl(page) {
   const params = new URLSearchParams();
 
+    // search text (user-typed)
+  const input = document.getElementById("searchInput");
+  const qVal = input ? input.value.trim() : "";
+
   if (currentMode === "trending") {
     if (currentTopic && currentTopic !== "All") {
       params.append("topic", currentTopic);
     }
   } else if (currentMode === "foryou") {
-    const preferred = getPreferredCategoryFromHistory();
-    if (preferred && preferred !== "All") {
-      params.append("topic", preferred);
+    if (isLoggedIn() && userProfile) {
+      // Use AI-style profile from backend
+      const cats = userProfile.topCategories || [];
+      const kws = userProfile.topKeywords || [];
+
+      const preferred = cats[0];
+      if (preferred && preferred !== "All") {
+        params.append("topic", preferred);
+      }
+
+      // If user hasn't manually searched, bias by top keywords
+      if (!qVal && kws.length) {
+        params.append("q", kws.slice(0, 5).join(" OR "));
+      }
+    } else {
+      // Guest: fallback to local click history
+      const preferred = getPreferredCategoryFromHistory();
+      if (preferred && preferred !== "All") {
+        params.append("topic", preferred);
+      }
     }
   }
 
-  // search text
-  const input = document.getElementById("searchInput");
-  const qVal = input ? input.value.trim() : "";
+  // Apply manual search last so it always wins
   if (qVal) params.append("q", qVal);
+
 
   params.append("limit", PAGE_SIZE.toString());
   params.append("page", String(page || 1));
@@ -377,6 +399,57 @@ async function toggleSavedOnBackend(article) {
   const data = await res.json();
   return data; // { saved: boolean, savedArticles: [...] }
 }
+async function sendReadingEventToBackend(item, category, topic) {
+  const token = getAuthToken();
+  if (!token) return;
+
+  try {
+    await fetch("/api/user/reading", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        url: item.url,
+        title: item.title,
+        category: category || item.category,
+        topic: topic || item.topic,
+        sourceLabel: item.sourceLabel
+      })
+    });
+  } catch (err) {
+    console.error("Failed to send reading event", err);
+  }
+}
+async function loadUserProfile() {
+  if (!isLoggedIn()) {
+    userProfile = null;
+    return;
+  }
+
+  try {
+    const res = await fetch("/api/user/profile", {
+      headers: {
+        Authorization: `Bearer ${getAuthToken()}`
+      }
+    });
+
+    if (!res.ok) {
+      console.error("Failed to load user profile", await res.text());
+      userProfile = null;
+      return;
+    }
+
+    userProfile = await res.json();
+    // console.log("User profile:", userProfile);
+  } catch (err) {
+    console.error("Error loading user profile", err);
+    userProfile = null;
+  }
+}
+
+
 
 
 // ---------- SEARCH ----------
@@ -439,12 +512,12 @@ function setupTopicFilters() {
 }
 
 // ---------- NAV (Trending / For You / Saved) ----------
-function setupNavModeSwitch() {
+async function setupNavModeSwitch() {
   const buttons = document.querySelectorAll(".nav-links .nav-btn");
   if (!buttons.length) return;
 
-  buttons.forEach(function (btn) {
-    btn.addEventListener("click", function () {
+    buttons.forEach(function (btn) {
+    btn.addEventListener("click", async function () {
       const view = btn.getAttribute("data-view");
       if (!view) return;
 
@@ -459,9 +532,15 @@ function setupNavModeSwitch() {
         return;
       }
 
+      if (currentMode === "foryou" && isLoggedIn()) {
+        await loadUserProfile();
+      }
+
       loadFeed(false);
     });
   });
+
+  
 }
 
 function setNavModeButtonActive(view) {
@@ -575,6 +654,13 @@ function setupClickTracking() {
     const category = card.dataset.category;
     const topic = card.dataset.topic;
     recordArticleClick(category, topic);
+    if (isLoggedIn()) {
+      const key = card.dataset.itemKey;
+      const item = findItemByKey(key);
+      if (item) {
+        sendReadingEventToBackend(item, category, topic);
+      }
+    }
   });
 }
 
