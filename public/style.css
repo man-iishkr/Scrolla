@@ -188,6 +188,94 @@ body {
   font-size: 0.72rem;
 }
 /* Right area with nav tabs + user pill */
+/* ---------- Save icon at top-right of card ---------- */
+.news-card {
+  position: relative; /* enable absolute children */
+}
+
+/* Bookmark icon button (round) */
+.save-icon-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 5;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.95);
+  border: 1px solid var(--border-subtle);
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.12s ease, box-shadow 0.12s ease;
+  box-shadow: 0 2px 6px rgba(15,23,42,0.06);
+}
+
+/* Hover / active */
+.save-icon-button:hover {
+  transform: translateY(-2px);
+  background: var(--primary-soft);
+  border-color: var(--primary);
+}
+
+.save-icon-button:active {
+  transform: translateY(0);
+}
+
+/* Filled state (when saved) */
+.save-icon-button.saved {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+/* small inline action buttons (Summary / Ask AI) */
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border-subtle);
+  background: #fff;
+  font-size: 0.78rem;
+  cursor: pointer;
+  min-height: 34px;
+  line-height: 1;
+  transition: background 0.12s ease, border-color 0.12s;
+}
+
+.action-btn:hover {
+  background: var(--primary-soft);
+  border-color: var(--primary);
+}
+
+.action-btn.small {
+  padding: 6px 10px;
+  font-size: 0.78rem;
+}
+
+/* layout: keep both small action buttons on one line */
+.news-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+/* if you still have .save-btn (text), hide or adapt it for accessibility */
+.save-btn {
+  display: none; /* we switch to icon button */
+}
+
+/* ensure image area does not overlap top-right icon visually on small screens */
+.news-image-wrap {
+  position: relative;
+  overflow: hidden;
+}
+
+
 .top-nav-right {
   display: flex;
   align-items: center;
@@ -404,6 +492,25 @@ body {
   cursor: pointer;
   text-decoration: underline;
 }
+.summary-btn {
+  border-radius: 999px;
+  padding: 6px 8px;
+  font-size: 0.75rem;
+  border: 1px solid var(--border-subtle);
+  background: #ffffff;
+  cursor: pointer;
+}
+
+.ask-ai-btn {
+  border-radius: 999px;
+  padding: 6px 8px;
+  font-size: 0.75rem;
+  border: 1px solid var(--primary);
+  background: var(--primary-soft);
+  color: var(--primary);
+  cursor: pointer;
+}
+
 
 /* Password field with toggle */
 .password-field {

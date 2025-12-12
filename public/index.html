@@ -105,6 +105,61 @@
     </div>
   </div>
   <!-- END AUTH POPUP -->
+   <!-- AI SUMMARY MODAL -->
+<div id="ai-summary-modal" class="auth-modal-backdrop hidden" aria-hidden="true">
+  <div class="auth-modal" role="dialog" aria-modal="true" aria-label="Article summary">
+    <h3 class="auth-modal-title">Article summary</h3>
+    <div id="ai-summary-content" class="auth-modal-text" style="white-space:pre-wrap; text-align:left;"></div>
+    <div style="margin-top:12px; display:flex; gap:8px; justify-content:flex-end;">
+      <button class="auth-modal-btn" id="ai-summary-close">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- AI CHAT MODAL -->
+<div id="ai-chat-modal" class="auth-modal-backdrop hidden" aria-hidden="true">
+  <div class="auth-modal" role="dialog" aria-modal="true" aria-label="Ask AI">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h3 class="auth-modal-title">Ask AI about this article</h3>
+      <button id="ai-chat-close" class="auth-modal-skip" title="Close">✕</button>
+    </div>
+
+    <div id="ai-chat-history" style="height:270px; overflow:auto; border:1px solid var(--border-subtle); padding:8px; border-radius:8px; background:#fafafa; margin-top:8px; text-align:left;"></div>
+
+    <div style="margin-top:10px; display:flex; gap:8px;">
+      <input id="ai-chat-input" placeholder="Ask a question about this article..." style="flex:1; padding:8px; border-radius:8px; border:1px solid var(--border-subtle);" />
+      <button id="ai-chat-send" class="auth-modal-btn auth-modal-btn-primary">Send</button>
+    </div>
+  </div>
+</div>
+<!-- AI SUMMARY MODAL -->
+<div id="ai-summary-modal" class="auth-modal-backdrop hidden" aria-hidden="true">
+  <div class="auth-modal" role="dialog" aria-modal="true" aria-label="Article summary">
+    <h3 class="auth-modal-title">Article summary</h3>
+    <div id="ai-summary-content" class="auth-modal-text" style="white-space:pre-wrap; text-align:left;"></div>
+    <div style="margin-top:12px; display:flex; gap:8px; justify-content:flex-end;">
+      <button class="auth-modal-btn" id="ai-summary-close">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- AI CHAT MODAL -->
+<div id="ai-chat-modal" class="auth-modal-backdrop hidden" aria-hidden="true">
+  <div class="auth-modal" role="dialog" aria-modal="true" aria-label="Ask AI">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h3 class="auth-modal-title">Ask AI about this article</h3>
+      <button id="ai-chat-close" class="auth-modal-skip" title="Close">✕</button>
+    </div>
+
+    <div id="ai-chat-history" style="height:270px; overflow:auto; border:1px solid var(--border-subtle); padding:8px; border-radius:8px; background:#fafafa; margin-top:8px; text-align:left;"></div>
+
+    <div style="margin-top:10px; display:flex; gap:8px;">
+      <input id="ai-chat-input" placeholder="Ask a question about this article..." style="flex:1; padding:8px; border-radius:8px; border:1px solid var(--border-subtle);" />
+      <button id="ai-chat-send" class="auth-modal-btn auth-modal-btn-primary">Send</button>
+    </div>
+  </div>
+</div>
+
 
   <!-- JS at the end so DOM is loaded first -->
   <script src="app.js"></script>

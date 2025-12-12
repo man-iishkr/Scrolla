@@ -1,11 +1,15 @@
 // backend/server.js
+require("dotenv").config();
+console.log('[dotenv] GEMINI_API_KEY present?', !!process.env.GEMINI_API_KEY);
 const mongoose = require("mongoose");
 const authRoutes = require("./routes/Authroutes");
 const userRoutes = require("./routes/userRoutes");
+const aiRoutes = require("./routes/aiRoutes");
 
 
 
-require("dotenv").config();
+
+
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
@@ -35,6 +39,7 @@ app.use(express.static(publicPath));
 // ✅ AUTH ROUTES
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
+app.use("/api/ai", aiRoutes);
 
 
 
