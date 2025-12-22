@@ -1,6 +1,6 @@
 require("dotenv").config();
 const mongoose = require("mongoose");
-const Article = require("./models/article");
+const Article = require("../models/article");
 
 async function clearDB() {
   await mongoose.connect(process.env.MONGODB_URI);

@@ -3,7 +3,7 @@ require("dotenv").config();
 const path = require("path");
 const fs = require("fs");
 const mongoose = require("mongoose");
-const Article = require("./models/article");
+const Article = require("../models/article");
 
 const MONGODB_URI = process.env.MONGODB_URI;
 

@@ -2,40 +2,12 @@ const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema(
   {
-    name: {
-      type: String,
-      required: true
-    },
-
-    email: {
-      type: String,
-      required: true,
-      unique: true
-    },
-
-    password: {
-      type: String,
-      required: true
-    },
-
-    savedArticles: {
-      type: Array,
-      default: []
-    },
-
-    readingHistory: {
-      type: [
-        {
-          url: String,
-          title: String,
-          category: String,
-          topic: String,
-          sourceLabel: String,
-          clickedAt: { type: Date, default: Date.now }
-        }
-      ],
-      default: []
-    }
+    name: String,
+    email: { type: String, unique: true },
+    password: String,
+    preferences: [String],
+    readingStats: Object,
+    savedArticles: [{ type: mongoose.Schema.Types.ObjectId, ref: "Article" }]
   },
   { timestamps: true }
 );

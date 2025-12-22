@@ -2,168 +2,111 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>WorldStream – Short News, Smart Feed</title>
+  <title>WorldStream · Short, smart updates</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Inshorts-style short updates for any topic you care about." />
 
-  <!-- Google Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet" />
-
-  <!-- External CSS -->
-  <link rel="stylesheet" href="style.css" />
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/base.css" />
+  <link rel="stylesheet" href="/css/layout.css" />
+  <link rel="stylesheet" href="/css/components.css" />
+  <link rel="stylesheet" href="/css/auth.css" />
+  <link rel="stylesheet" href="/css/ai.css" />
 </head>
+
 <body>
-  <!-- TOP NAV -->
-<header class="top-nav">
-  <div class="logo">
-    <img src="/Logo.png" alt="WorldStream logo" class="logo-icon-img" />
+
+  <!-- AUTH GATE MODAL (Guest / Login / Register) -->
+  <div id="auth-gate" class="modal hidden">
+    <div class="modal-card">
+      <h2>Welcome to WorldStream</h2>
+      <p>Short, smart news updates personalised for you.</p>
+
+      <div class="modal-actions">
+        <a href="/login.html" class="btn primary">Login</a>
+        <a href="/register.html" class="btn secondary">Register</a>
+        <button id="continue-guest" class="btn ghost">
+          Continue as Guest
+        </button>
+      </div>
+    </div>
   </div>
 
-  <div class="top-nav-right">
-    <nav class="nav-links">
-      <button class="nav-btn nav-btn-primary" data-view="trending">Trending</button>
+  <!-- HEADER -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <img src="/assets/logo.png" alt="WorldStream" class="logo" />
+    </div>
+
+    <nav class="topbar-nav">
+      <button class="nav-btn active" data-view="trending">Trending</button>
       <button class="nav-btn" data-view="foryou">For You</button>
       <button class="nav-btn" data-view="saved">Saved</button>
     </nav>
 
-    <button id="authUserBtn" class="nav-user-btn">
-      Sign in
-    </button>
-  </div>
-</header>
-
-
-
-
-  <!-- TOPIC BAR -->
-  <section class="topic-bar">
-    <div class="topic-scroll">
-      <button class="topic-pill topic-pill-active">All</button>
-      <button class="topic-pill">Technology</button>
-      <button class="topic-pill">Startups</button>
-      <button class="topic-pill">Sports</button>
-      <button class="topic-pill">Markets</button>
-      <button class="topic-pill">Science</button>
-      <button class="topic-pill">Entertainment</button>
+    <div class="topbar-right">
+      <button id="signin-btn" class="btn outline small">Sign in</button>
+      <span id="user-badge" class="hidden"></span>
     </div>
+  </header>
+
+  <!-- CATEGORY TABS -->
+  <section class="category-bar">
+    <button class="cat-btn active" data-category="All">All</button>
+    <button class="cat-btn" data-category="Technology">Technology</button>
+    <button class="cat-btn" data-category="Business">Business</button>
+    <button class="cat-btn" data-category="Sports">Sports</button>
+    <button class="cat-btn" data-category="Science">Science</button>
+    <button class="cat-btn" data-category="Entertainment">Entertainment</button>
   </section>
 
   <!-- SEARCH -->
-  <section class="search-wrap">
+  <section class="search-bar">
     <input
-      type="text"
-      class="search-input"
       id="searchInput"
-      placeholder="Search topic... e.g. AI, Cricket, IPOs"
+      type="text"
+      placeholder="Search topics… e.g. AI, Cricket, IPOs"
     />
   </section>
 
-  <!-- MAIN FEED -->
-  <main class="feed" id="feed">
-    <!-- This placeholder will be replaced by JS -->
-    <article class="news-card news-card-placeholder">
-      <div class="news-content">
-        <h2 class="news-title">Loading your personalised short news feed...</h2>
-        <p class="news-body">
-          We’re fetching trending stories based on your selected topic. This will be replaced
-          with real cards once the data loads.
-        </p>
-        <div class="news-footer">
-          <span class="news-meta">Frontend · Static placeholder</span>
-          <span class="news-readmore">powered by <strong>WorldStream</strong></span>
-        </div>
-      </div>
-    </article>
+  <!-- FEED -->
+  <main id="feed" class="feed-container">
+    <!-- News cards injected here -->
   </main>
+  <div id="summary-modal" class="modal hidden">
+  <div class="modal-backdrop"></div>
+  <div class="modal-box">
+    <button class="modal-close" onclick="this.closest('.modal').classList.add('hidden')">
+      ✕
+    </button>
+    <h2>Summary</h2>
+    <div id="summary-content" class="modal-content">
+      Loading...
+    </div>
+  </div>
+</div>
+<div id="ai-chat-modal" class="modal hidden">
+  <div class="modal-backdrop"></div>
+  <div class="modal-box">
+    <button class="modal-close" onclick="this.closest('.modal').classList.add('hidden')">
+      ✕
+    </button>
+    <h2>Ask AI</h2>
+    <div id="ai-chat-history" class="modal-content"></div>
+
+    <div class="ai-input-row">
+      <input id="ai-input" placeholder="Ask a question..." />
+      <button id="ai-send">Send</button>
+    </div>
+  </div>
+</div>
+
 
   <!-- FOOTER -->
-  <footer class="app-footer">
-    <span>© <span id="year"></span> WorldStream · Short, smart updates.</span>
+  <footer class="footer">
+    © 2025 WorldStream · Short, smart updates.
   </footer>
 
-  
-    <!-- AUTH POPUP -->
-  <div id="auth-modal" class="auth-modal-backdrop hidden">
-    <div class="auth-modal">
-      <h2 class="auth-modal-title">Welcome to WorldStream</h2>
-      <p class="auth-modal-text">
-        Login or create a free account to save stories and get a personalised <strong>For You</strong> feed.
-      </p>
-
-      <div class="auth-modal-actions">
-        <button id="authLoginBtn" class="auth-modal-btn auth-modal-btn-primary">
-          Login
-        </button>
-        <button id="authRegisterBtn" class="auth-modal-btn">
-          Register
-        </button>
-      </div>
-
-      <button id="authSkipBtn" class="auth-modal-skip">
-        Continue as guest
-      </button>
-    </div>
-  </div>
-  <!-- END AUTH POPUP -->
-   <!-- AI SUMMARY MODAL -->
-<div id="ai-summary-modal" class="auth-modal-backdrop hidden" aria-hidden="true">
-  <div class="auth-modal" role="dialog" aria-modal="true" aria-label="Article summary">
-    <h3 class="auth-modal-title">Article summary</h3>
-    <div id="ai-summary-content" class="auth-modal-text" style="white-space:pre-wrap; text-align:left;"></div>
-    <div style="margin-top:12px; display:flex; gap:8px; justify-content:flex-end;">
-      <button class="auth-modal-btn" id="ai-summary-close">Close</button>
-    </div>
-  </div>
-</div>
-
-<!-- AI CHAT MODAL -->
-<div id="ai-chat-modal" class="auth-modal-backdrop hidden" aria-hidden="true">
-  <div class="auth-modal" role="dialog" aria-modal="true" aria-label="Ask AI">
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-      <h3 class="auth-modal-title">Ask AI about this article</h3>
-      <button id="ai-chat-close" class="auth-modal-skip" title="Close">✕</button>
-    </div>
-
-    <div id="ai-chat-history" style="height:270px; overflow:auto; border:1px solid var(--border-subtle); padding:8px; border-radius:8px; background:#fafafa; margin-top:8px; text-align:left;"></div>
-
-    <div style="margin-top:10px; display:flex; gap:8px;">
-      <input id="ai-chat-input" placeholder="Ask a question about this article..." style="flex:1; padding:8px; border-radius:8px; border:1px solid var(--border-subtle);" />
-      <button id="ai-chat-send" class="auth-modal-btn auth-modal-btn-primary">Send</button>
-    </div>
-  </div>
-</div>
-<!-- AI SUMMARY MODAL -->
-<div id="ai-summary-modal" class="auth-modal-backdrop hidden" aria-hidden="true">
-  <div class="auth-modal" role="dialog" aria-modal="true" aria-label="Article summary">
-    <h3 class="auth-modal-title">Article summary</h3>
-    <div id="ai-summary-content" class="auth-modal-text" style="white-space:pre-wrap; text-align:left;"></div>
-    <div style="margin-top:12px; display:flex; gap:8px; justify-content:flex-end;">
-      <button class="auth-modal-btn" id="ai-summary-close">Close</button>
-    </div>
-  </div>
-</div>
-
-<!-- AI CHAT MODAL -->
-<div id="ai-chat-modal" class="auth-modal-backdrop hidden" aria-hidden="true">
-  <div class="auth-modal" role="dialog" aria-modal="true" aria-label="Ask AI">
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-      <h3 class="auth-modal-title">Ask AI about this article</h3>
-      <button id="ai-chat-close" class="auth-modal-skip" title="Close">✕</button>
-    </div>
-
-    <div id="ai-chat-history" style="height:270px; overflow:auto; border:1px solid var(--border-subtle); padding:8px; border-radius:8px; background:#fafafa; margin-top:8px; text-align:left;"></div>
-
-    <div style="margin-top:10px; display:flex; gap:8px;">
-      <input id="ai-chat-input" placeholder="Ask a question about this article..." style="flex:1; padding:8px; border-radius:8px; border:1px solid var(--border-subtle);" />
-      <button id="ai-chat-send" class="auth-modal-btn auth-modal-btn-primary">Send</button>
-    </div>
-  </div>
-</div>
-
-
-  <!-- JS at the end so DOM is loaded first -->
-  <script src="app.js"></script>
+  <!-- JS ENTRY -->
+  <script type="module" src="/js/app.js"></script>
 </body>
 </html>
-
-

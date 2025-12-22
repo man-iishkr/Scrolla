@@ -1,45 +1,36 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Register | WorldStream</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body class="auth-page">
-  <div class="auth-box">
-    <h2>Register</h2>
+<body>
 
-    <input type="text" id="name" placeholder="Full Name" />
-    <input type="email" id="email" placeholder="Email" />
+<div class="auth-page">
+  <div class="auth-card">
 
-    <!-- Password with toggle -->
-    <div class="password-field">
-      <input type="password" id="password" placeholder="Password" />
-      <button
-        type="button"
-        class="toggle-password"
-        data-target="password"
-      >
-        Show
-      </button>
+    <h1>Create account</h1>
+    <p class="auth-sub">Join WorldStream in seconds</p>
+
+    <form id="register-form" class="auth-form">
+      <label>Name</label>
+      <input id="name" class="auth-input" required>
+
+      <label>Email</label>
+      <input id="email" type="email" class="auth-input" required>
+
+      <label>Password</label>
+      <div class="password-row">
+        <input id="password" type="password" class="auth-input" required>
+        <button type="button" id="togglePass" class="toggle-pass">Show</button>
+      </div>
+
+      <div id="passwordStrength" class="password-strength"></div>
+
+      <button type="submit" class="auth-btn">Create account</button>
+    </form>
+
+    <div class="auth-footer">
+      Already have an account? <a href="/login.html">Sign in</a>
     </div>
 
-    <!-- Strength meter -->
-    <div class="password-strength">
-      <div class="password-strength-bar" id="passwordStrengthBar"></div>
-      <span class="password-strength-label" id="passwordStrengthLabel">
-        Password strength
-      </span>
-    </div>
-
-    <!-- MAIN SUBMIT BUTTON HAS ITS OWN CLASS -->
-    <button class="auth-submit-btn" onclick="register()">Register</button>
-
-    <p>Already have an account? <a href="login.html">Login</a></p>
   </div>
+</div>
+<link rel="stylesheet" href="/css/auth.css">
 
-  <script src="auth.js"></script>
+<script type="module" src="/js/auth/register.page.js"></script>
 </body>
-
-
-</html>

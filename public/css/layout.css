@@ -1,0 +1,75 @@
+/* HEADER */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  height: 36px;          /* 🔥 THIS FIXES THE ISSUE */
+  width: auto;
+}
+
+/* NAV */
+.topbar-nav {
+  display: flex;
+  gap: 10px;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* CATEGORY BAR */
+.category-bar {
+  display: flex;
+  gap: 8px;
+  padding: 10px 16px;
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  overflow-x: auto;
+}
+
+/* SEARCH */
+.search-bar {
+  padding: 12px 16px;
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.search-bar input {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+}
+
+/* FEED */
+.feed-container {
+  max-width: 720px;
+  margin: 0 auto 3rem;
+  padding: 0 1rem;
+  min-height: 300px;
+}
+
+/* FOOTER */
+.footer {
+  text-align: center;
+  padding: 16px;
+  font-size: 13px;
+  color: #6b7280;
+}

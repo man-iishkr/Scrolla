@@ -1,35 +1,31 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Login | WorldStream</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body class="auth-page">
-  <div class="auth-box">
-    <h2>Login</h2>
+<body>
 
-    <input type="email" id="email" placeholder="Email" />
+<div class="auth-page">
+  <div class="auth-card">
 
-    <!-- Password with toggle -->
-    <div class="password-field">
-      <input type="password" id="password" placeholder="Password" />
-      <button
-        type="button"
-        class="toggle-password"
-        data-target="password"
-      >
-        Show
-      </button>
+    <h1>Sign in</h1>
+    <p class="auth-sub">Use your WorldStream account</p>
+
+    <form id="login-form" class="auth-form">
+      <label>Email</label>
+      <input id="email" type="email" class="auth-input" required>
+
+      <label>Password</label>
+      <div class="password-row">
+        <input id="password" type="password" class="auth-input" required>
+        <button type="button" id="togglePass" class="toggle-pass">Show</button>
+      </div>
+
+      <button type="submit" class="auth-btn">Sign in</button>
+    </form>
+
+    <div class="auth-footer">
+      Don’t have an account? <a href="/register.html">Create account</a>
     </div>
 
-    <button class="auth-submit-btn" onclick="login()">Login</button>
-
-    <p>Don't have an account? <a href="register.html">Register</a></p>
   </div>
+</div>
+<link rel="stylesheet" href="/css/auth.css">
 
-  <script src="auth.js"></script>
+<script type="module" src="/js/auth/login.page.js"></script>
 </body>
-
-
-</html>
