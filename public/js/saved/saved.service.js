@@ -1,31 +1,27 @@
-// public/js/saved/saved.service.js
-// --------------------------------
+const SavedService = {
+  async loadSavedArticles() {
+    if (AppState.isGuest()) {
+      showError('Please login to view saved articles');
+      return;
+    }
 
-import { LOCAL_KEY_SAVED_ITEMS } from "../core/state.js";
+    try {
+      const response = await API.user.getSavedArticles();
+      AppState.savedArticles = response.savedArticles || [];
+      return AppState.savedArticles;
+    } catch (error) {
+      console.error('Load saved articles error:', error);
+      throw error;
+    }
+  },
 
-function getSavedItemsRaw() {
-  try {
-    return JSON.parse(localStorage.getItem(LOCAL_KEY_SAVED_ITEMS)) || [];
-  } catch {
-    return [];
+  async syncSavedArticles() {
+    if (!AppState.isGuest() && AppState.isAuthenticated()) {
+      try {
+        await this.loadSavedArticles();
+      } catch (error) {
+        console.error('Sync error:', error);
+      }
+    }
   }
-}
-
-export function loadSavedUnified() {
-  return getSavedItemsRaw();
-}
-
-export function isItemSavedLocal(key) {
-  return getSavedItemsRaw().some((i) => i.key === key);
-}
-
-export function toggleSavedItemLocal(key, item) {
-  const items = getSavedItemsRaw();
-  const idx = items.findIndex((i) => i.key === key);
-  if (idx >= 0) {
-    items.splice(idx, 1);
-  } else {
-    items.push({ ...item, key });
-  }
-  localStorage.setItem(LOCAL_KEY_SAVED_ITEMS, JSON.stringify(items));
-}
+};

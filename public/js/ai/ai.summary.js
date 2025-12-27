@@ -1,28 +1,55 @@
 // public/js/ai/ai.summary.js
+// AI Summary functionality
 
-export function openSummaryForItem(item) {
-  const modal = document.getElementById("summary-modal");
-  const box = document.getElementById("summary-content");
+let currentSummaryArticle = null;
 
-  if (!modal || !box) return;
+async function showSummary(articleId) {
+  const article = findArticleById(articleId);
+  if (!article) return;
 
-  box.textContent = "Generating summary...";
-  modal.classList.remove("hidden");
+  currentSummaryArticle = article;
 
-  // backend hook already exists
-  fetch("/api/ai/summary", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      title: item.title,
-      content: item.description || ""
-    })
-  })
-    .then(r => r.json())
-    .then(d => {
-      box.textContent = d.summary || "Summary unavailable.";
-    })
-    .catch(() => {
-      box.textContent = "Summary failed.";
-    });
+  const modal = document.getElementById('summaryModal');
+  const loadingEl = modal.querySelector('.summary-loading');
+  const contentEl = modal.querySelector('.summary-content');
+
+  modal.classList.remove('hidden');
+  loadingEl.classList.remove('hidden');
+  contentEl.classList.add('hidden');
+
+  try {
+    const content = article.content || article.description || article.title;
+    const summary = await API.ai.generateSummary(article.title, content);
+
+    contentEl.innerHTML = `<p>${escapeHtml(summary)}</p>`;
+    loadingEl.classList.add('hidden');
+    contentEl.classList.remove('hidden');
+
+  } catch (error) {
+    console.error('Summary Error:', error);
+    contentEl.innerHTML = `
+      <p style="color: var(--danger);">
+        Failed to generate summary. Please try again.
+      </p>
+    `;
+    loadingEl.classList.add('hidden');
+    contentEl.classList.remove('hidden');
+  }
 }
+
+function closeSummaryModal() {
+  const modal = document.getElementById('summaryModal');
+  modal.classList.add('hidden');
+  currentSummaryArticle = null;
+}
+
+function escapeHtml(text) {
+  if (!text) return '';
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// Make globally available
+window.showSummary = showSummary;
+window.closeSummaryModal = closeSummaryModal;

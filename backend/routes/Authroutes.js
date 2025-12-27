@@ -1,8 +1,12 @@
-// backend/routes/authRoutes.js
-const router = require("express").Router();
-const { register, login } = require("../controllers/authController");
+const express = require('express');
+const router = express.Router();
+const authController = require('../controllers/authController');
 
-router.post("/register", register);
-router.post("/login", login);
+router.post('/register', authController.register);
+router.post('/login', authController.login);
+router.post('/send-otp', authController.sendOTP);
+router.post('/verify-otp', authController.verifyOTP);
+router.post('/guest', authController.continueAsGuest);
+router.post('/check-password', authController.checkPasswordStrength);
 
 module.exports = router;

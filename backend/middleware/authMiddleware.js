@@ -1,19 +1,45 @@
-const jwt = require("jsonwebtoken");
-const User = require("../models/user");
+const jwt = require('jsonwebtoken');
+const User = require('../models/user');
 
-module.exports = async function (req, res, next) {
+const authMiddleware = async (req, res, next) => {
   try {
-    const token = req.headers.authorization?.split(" ")[1];
-    if (!token) return res.status(401).json({ error: "No token" });
+    const token = req.header('Authorization')?.replace('Bearer ', '');
+    
+    if (!token) {
+      return res.status(401).json({ error: 'No authentication token provided' });
+    }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.id).select("-password");
+    const user = await User.findById(decoded.userId);
 
-    if (!user) return res.status(401).json({ error: "Invalid token" });
+    if (!user) {
+      return res.status(401).json({ error: 'User not found' });
+    }
 
     req.user = user;
+    req.userId = user._id;
     next();
-  } catch (err) {
-    res.status(401).json({ error: "Unauthorized" });
+  } catch (error) {
+    res.status(401).json({ error: 'Invalid or expired token' });
   }
 };
+
+const optionalAuth = async (req, res, next) => {
+  try {
+    const token = req.header('Authorization')?.replace('Bearer ', '');
+    
+    if (token) {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const user = await User.findById(decoded.userId);
+      if (user) {
+        req.user = user;
+        req.userId = user._id;
+      }
+    }
+    next();
+  } catch (error) {
+    next();
+  }
+};
+
+module.exports = { authMiddleware, optionalAuth };

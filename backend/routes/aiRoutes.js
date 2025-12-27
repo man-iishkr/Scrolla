@@ -1,24 +1,10 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
+const aiController = require('../controllers/aiController');
+const { optionalAuth } = require('../middleware/authMiddleware');
 
-/* Controllers */
-const {
-  getSummary,
-  askAi
-} = require("../controllers/aiController");
-
-/* -------- AI ROUTES -------- */
-
-/**
- * POST /api/ai/summary
- * Body: { title, description, url }
- */
-router.post("/summary", getSummary);
-
-/**
- * POST /api/ai/chat
- * Body: { question }
- */
-router.post("/chat", askAi);
+router.post('/summary', optionalAuth, aiController.generateSummary);
+router.post('/ask', optionalAuth, aiController.askAI);
+router.post('/chat', optionalAuth, aiController.chat);
 
 module.exports = router;

@@ -1,46 +1,94 @@
-const password = document.getElementById("password");
-const toggle = document.getElementById("togglePass");
+// public/js/auth/login.page.js
+document.addEventListener('DOMContentLoaded', () => {
+  const loginForm = document.getElementById('loginForm');
+  const useOTPCheckbox = document.getElementById('useOTP');
+  const otpSection = document.getElementById('otpSection');
+  const loginBtn = document.getElementById('loginBtn');
+  const resendOTPBtn = document.getElementById('resendOTP');
+  let otpSent = false;
 
-toggle?.addEventListener("click", () => {
-  password.type = password.type === "password" ? "text" : "password";
-  toggle.textContent = password.type === "password" ? "Show" : "Hide";
-});
-const form = document.getElementById("login-form");
+  // OTP checkbox handler
+  if (useOTPCheckbox) {
+    useOTPCheckbox.addEventListener('change', async (e) => {
+      if (e.target.checked) {
+        const email = document.getElementById('email').value;
+        if (!email) {
+          showError('Please enter your email first');
+          e.target.checked = false;
+          return;
+        }
 
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  const email = form.email.value.trim();
-  const password = form.password.value;
-
-  if (!email || !password) {
-    alert("Email and password required");
-    return;
+        try {
+          loginBtn.disabled = true;
+          loginBtn.textContent = 'Sending OTP...';
+          
+          await API.auth.sendOTP(email);
+          
+          otpSection.classList.remove('hidden');
+          showSuccess('OTP sent to your email');
+          otpSent = true;
+          loginBtn.textContent = 'Verify OTP';
+        } catch (error) {
+          showError(error.message);
+          e.target.checked = false;
+        } finally {
+          loginBtn.disabled = false;
+        }
+      } else {
+        otpSection.classList.add('hidden');
+        otpSent = false;
+        loginBtn.textContent = 'Login';
+      }
+    });
   }
 
-  try {
-    const res = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password })
+  // Resend OTP button
+  if (resendOTPBtn) {
+    resendOTPBtn.addEventListener('click', async () => {
+      const email = document.getElementById('email').value;
+      try {
+        await API.auth.sendOTP(email);
+        showSuccess('OTP resent successfully');
+      } catch (error) {
+        showError(error.message);
+      }
     });
+  }
 
-    const data = await res.json();
+  // Form submission
+  if (loginForm) {
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const otp = document.getElementById('otp')?.value;
 
-    if (!res.ok) {
-      alert(data.message || "Login failed");
-      return;
-    }
+      try {
+        loginBtn.disabled = true;
+        loginBtn.textContent = 'Logging in...';
 
-    // ✅ STORE AUTH (CRITICAL)
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("user", JSON.stringify(data.user));
+        let response;
+        
+        if (otpSent && otp) {
+          response = await API.auth.verifyOTP(email, otp);
+        } else {
+          response = await API.auth.login({ email, password });
+        }
 
-    // ✅ GO HOME
-    window.location.href = "/index.html";
-
-  } catch (err) {
-    console.error(err);
-    alert("Something went wrong");
+        AppState.setAuth(response.token, response.user);
+        
+        showSuccess('Login successful! Redirecting...');
+        
+        setTimeout(() => {
+          window.location.href = 'index.html';
+        }, 1000);
+        
+      } catch (error) {
+        showError(error.message);
+        loginBtn.disabled = false;
+        loginBtn.textContent = otpSent ? 'Verify OTP' : 'Login';
+      }
+    });
   }
 });
