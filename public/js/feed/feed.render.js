@@ -4,14 +4,22 @@
 function renderArticles(append = false) {
   const container = document.getElementById('newsCards');
   
+  if (!container) {
+    console.error('newsCards container not found');
+    return;
+  }
+  
   if (!append) {
     container.innerHTML = '';
   }
 
-  if (AppState.articles.length === 0) {
+  if (!AppState.articles || AppState.articles.length === 0) {
+    console.log('No articles to render');
     showEmptyState(AppState.currentTab);
     return;
   }
+
+  console.log(`Rendering ${AppState.articles.length} articles (append: ${append})`);
 
   // Render all articles in grid
   AppState.articles.forEach((article, index) => {
@@ -23,6 +31,8 @@ function renderArticles(append = false) {
     const card = createArticleCard(article, index);
     container.appendChild(card);
   });
+  
+  console.log(`✓ Rendered ${container.children.length} cards total`);
 }
 
 function createArticleCard(article, index) {
@@ -94,7 +104,9 @@ function setupCardEventListeners(card) {
   if (saveBtn) {
     saveBtn.addEventListener('click', () => {
       const articleId = saveBtn.dataset.articleId;
-      toggleSaveArticle(articleId);
+      if (typeof toggleSaveArticle === 'function') {
+        toggleSaveArticle(articleId);
+      }
     });
   }
 
@@ -103,7 +115,9 @@ function setupCardEventListeners(card) {
   if (summaryBtn) {
     summaryBtn.addEventListener('click', () => {
       const articleId = summaryBtn.dataset.articleId;
-      showSummary(articleId);
+      if (typeof showSummary === 'function') {
+        showSummary(articleId);
+      }
     });
   }
 
@@ -112,7 +126,9 @@ function setupCardEventListeners(card) {
   if (askAiBtn) {
     askAiBtn.addEventListener('click', () => {
       const articleId = askAiBtn.dataset.articleId;
-      showAskAI(articleId);
+      if (typeof showAskAI === 'function') {
+        showAskAI(articleId);
+      }
     });
   }
 
@@ -128,7 +144,7 @@ function setupCardEventListeners(card) {
 }
 
 function openArticle(url, category) {
-  if (category) {
+  if (category && typeof FeedService !== 'undefined') {
     FeedService.trackArticleClick(category);
   }
   window.open(url, '_blank', 'noopener,noreferrer');
@@ -173,3 +189,6 @@ function getAIIcon() {
     </svg>
   `;
 }
+
+// Make functions globally available
+window.renderArticles = renderArticles;

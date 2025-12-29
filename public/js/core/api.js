@@ -1,4 +1,3 @@
-// API configuration and methods
 const API = {
   baseURL: 'http://localhost:5000/api',
 
@@ -8,13 +7,13 @@ const API = {
       'Content-Type': 'application/json'
     };
 
-    if (AppState.token) {
+    if (typeof AppState !== 'undefined' && AppState.token) {
       headers['Authorization'] = `Bearer ${AppState.token}`;
     }
 
     return headers;
   },
-
+ 
   // Generic request method
   async request(endpoint, options = {}) {
     try {
@@ -42,6 +41,18 @@ const API = {
       API.request('/auth/register', {
         method: 'POST',
         body: JSON.stringify(userData)
+      }),
+
+    verifyEmail: (email, code) =>
+      API.request('/auth/verify-email', {
+        method: 'POST',
+        body: JSON.stringify({ email, code })
+      }),
+
+    resendVerification: (email) =>
+      API.request('/auth/resend-verification', {
+        method: 'POST',
+        body: JSON.stringify({ email })
       }),
 
     login: (credentials) => 
@@ -99,25 +110,40 @@ const API = {
       })
   },
 
-  // AI endpoints
+  // AI endpoints - Updated to properly extract text from response
   ai: {
-    generateSummary: (title, content) => 
-      API.request('/ai/summary', {
+    generateSummary: async (title, content) => {
+      const response = await API.request('/ai/summary', {
         method: 'POST',
         body: JSON.stringify({ title, content })
-      }),
+      });
+      
+      // Extract the summary text from the response
+      // response.summary is already a string from backend
+      return response.summary;
+    },
 
-    askAI: (question, articleContext) => 
-      API.request('/ai/ask', {
+    askAI: async (question, articleContext) => {
+      const response = await API.request('/ai/ask', {
         method: 'POST',
         body: JSON.stringify({ question, articleContext })
-      }),
+      });
+      
+      // Extract the answer text from the response
+      // response.answer is already a string from backend
+      return response.answer;
+    },
 
-    chat: (messages) => 
-      API.request('/ai/chat', {
+    chat: async (messages) => {
+      const response = await API.request('/ai/chat', {
         method: 'POST',
         body: JSON.stringify({ messages })
-      })
+      });
+      
+      // Extract the reply text from the response
+      // response.reply is already a string from backend
+      return response.reply;
+    }
   },
 
   // User endpoints

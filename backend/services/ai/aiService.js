@@ -1,95 +1,131 @@
+// backend/services/ai/aiService.js - Fixed for Gemini 2.5 Flash
 const axios = require('axios');
 
 class AIService {
   constructor() {
-    this.deepseekApiKey = process.env.DEEPSEEK_API_KEY;
-    this.deepseekBase = 'https://api.deepseek.com/v1';
+    this.geminiApiKey = process.env.GEMINI_API_KEY;
+    this.geminiBase = 'https://generativelanguage.googleapis.com/v1beta';
+    // Use gemini-2.5-flash instead of gemini-pro
+    this.model = 'gemini-2.5-flash';
   }
 
   async generateSummary(articleText, title) {
     try {
-      const prompt = `Summarize the following news article in 30-50 words. Focus on the key facts and main points:\n\nTitle: ${title}\n\nArticle: ${articleText}`;
+      if (!this.geminiApiKey) {
+        throw new Error('Gemini API key not configured');
+      }
+
+      const prompt = `Summarize the following news article in 30-50 words. Focus on the key facts and main points. Provide only the summary without any preamble.\n\nTitle: ${title}\n\nArticle: ${articleText}`;
 
       const response = await axios.post(
-        `${this.deepseekBase}/chat/completions`,
+        `${this.geminiBase}/models/${this.model}:generateContent?key=${this.geminiApiKey}`,
         {
-          model: 'deepseek-chat',
-          messages: [
-            { role: 'system', content: 'You are a helpful assistant that creates concise news summaries.' },
-            { role: 'user', content: prompt }
-          ],
-          max_tokens: 100,
-          temperature: 0.3
+          contents: [{
+            parts: [{
+              text: prompt
+            }]
+          }],
+          generationConfig: {
+            temperature: 0.4,
+            maxOutputTokens: 150,
+            topP: 0.8,
+            topK: 10
+          }
         },
         {
           headers: {
-            'Authorization': `Bearer ${this.deepseekApiKey}`,
             'Content-Type': 'application/json'
           }
         }
       );
 
-      return response.data.choices[0].message.content.trim();
+      const summary = response.data.candidates[0].content.parts[0].text.trim();
+      return summary;
     } catch (error) {
-      console.error('DeepSeek Summary Error:', error.response?.data || error.message);
+      console.error('Gemini Summary Error:', error.response?.data || error.message);
+      
+      // Provide fallback summary
+      if (error.response?.status === 400 || error.response?.status === 404) {
+        console.error('Gemini API error - check API key or model name');
+      }
+      
       throw new Error('Failed to generate summary');
     }
   }
 
   async askAI(question, articleContext) {
     try {
-      const prompt = `Based on this news article context, answer the following question:\n\nArticle Context: ${articleContext}\n\nQuestion: ${question}\n\nProvide a clear, factual answer in 2-3 sentences.`;
+      if (!this.geminiApiKey) {
+        throw new Error('Gemini API key not configured');
+      }
+
+      const prompt = `Based on this news article context, answer the following question. Provide a clear, factual answer in 2-3 sentences.\n\nArticle Context: ${articleContext}\n\nQuestion: ${question}\n\nAnswer:`;
 
       const response = await axios.post(
-        `${this.deepseekBase}/chat/completions`,
+        `${this.geminiBase}/models/${this.model}:generateContent?key=${this.geminiApiKey}`,
         {
-          model: 'deepseek-chat',
-          messages: [
-            { role: 'system', content: 'You are a helpful news assistant that answers questions about news articles accurately and concisely.' },
-            { role: 'user', content: prompt }
-          ],
-          max_tokens: 200,
-          temperature: 0.5
+          contents: [{
+            parts: [{
+              text: prompt
+            }]
+          }],
+          generationConfig: {
+            temperature: 0.5,
+            maxOutputTokens: 200,
+            topP: 0.8,
+            topK: 40
+          }
         },
         {
           headers: {
-            'Authorization': `Bearer ${this.deepseekApiKey}`,
             'Content-Type': 'application/json'
           }
         }
       );
 
-      return response.data.choices[0].message.content.trim();
+      const answer = response.data.candidates[0].content.parts[0].text.trim();
+      return answer;
     } catch (error) {
-      console.error('DeepSeek AskAI Error:', error.response?.data || error.message);
+      console.error('Gemini AskAI Error:', error.response?.data || error.message);
       throw new Error('Failed to get AI response');
     }
   }
 
   async chat(messages) {
     try {
+      if (!this.geminiApiKey) {
+        throw new Error('Gemini API key not configured');
+      }
+
+      // Convert messages to Gemini format
+      const geminiMessages = messages.map(msg => ({
+        parts: [{
+          text: msg.content
+        }]
+      }));
+
       const response = await axios.post(
-        `${this.deepseekBase}/chat/completions`,
+        `${this.geminiBase}/models/${this.model}:generateContent?key=${this.geminiApiKey}`,
         {
-          model: 'deepseek-chat',
-          messages: [
-            { role: 'system', content: 'You are a helpful news assistant.' },
-            ...messages
-          ],
-          max_tokens: 300,
-          temperature: 0.7
+          contents: geminiMessages,
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 300,
+            topP: 0.9,
+            topK: 40
+          }
         },
         {
           headers: {
-            'Authorization': `Bearer ${this.deepseekApiKey}`,
             'Content-Type': 'application/json'
           }
         }
       );
 
-      return response.data.choices[0].message.content.trim();
+      const reply = response.data.candidates[0].content.parts[0].text.trim();
+      return reply;
     } catch (error) {
-      console.error('DeepSeek Chat Error:', error.response?.data || error.message);
+      console.error('Gemini Chat Error:', error.response?.data || error.message);
       throw new Error('Failed to chat with AI');
     }
   }

@@ -1,15 +1,20 @@
 // public/js/auth/register.page.js
 let currentStep = 1;
 let userLocation = null;
+let userEmail = '';
+let userData = {};
 
 document.addEventListener('DOMContentLoaded', () => {
   const registerForm = document.getElementById('registerForm');
   const passwordInput = document.getElementById('password');
   const emailInput = document.getElementById('email');
   const nextStepBtn = document.getElementById('nextStepBtn');
-  const backStepBtn = document.getElementById('backStepBtn');
+  const backStep1Btn = document.getElementById('backStep1Btn');
+  const verifyEmailBtn = document.getElementById('verifyEmailBtn');
+  const resendCodeBtn = document.getElementById('resendCodeBtn');
   const enableLocationBtn = document.getElementById('enableLocationBtn');
   const skipLocationStepBtn = document.getElementById('skipLocationStepBtn');
+  const completeBtn = document.getElementById('completeBtn');
 
   // Email validation
   if (emailInput) {
@@ -48,14 +53,114 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 300));
   }
 
-  // Next step button
+  // Next step button - Send verification email
   if (nextStepBtn) {
-    nextStepBtn.addEventListener('click', goToStep2);
+    nextStepBtn.addEventListener('click', async () => {
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      if (!name || name.length < 2) {
+        showError('Please enter a valid name (at least 2 characters)');
+        return;
+      }
+
+      if (!email || !validateEmail(email)) {
+        showError('Please enter a valid email address');
+        return;
+      }
+
+      if (!password) {
+        showError('Please enter a password');
+        return;
+      }
+
+      const strength = checkPasswordStrength(password);
+      if (strength.score < 3) {
+        showError('Please use a stronger password (Good or Strong)');
+        return;
+      }
+
+      // Store user data
+      userData = { name, email, password };
+      userEmail = email;
+
+      try {
+        nextStepBtn.disabled = true;
+        nextStepBtn.textContent = 'Sending verification code...';
+
+        const response = await API.auth.register({
+          name,
+          email,
+          password,
+          language: 'en',
+          location: { country: 'IN', state: 'Delhi', city: 'New Delhi' }
+        });
+
+        if (response.requiresVerification) {
+          document.getElementById('emailDisplay').textContent = email;
+          goToStep(2);
+          showSuccess('Verification code sent to your email!');
+        }
+      } catch (error) {
+        showError(error.message || 'Failed to send verification code');
+      } finally {
+        nextStepBtn.disabled = false;
+        nextStepBtn.textContent = 'Next';
+      }
+    });
   }
 
-  // Back step button
-  if (backStepBtn) {
-    backStepBtn.addEventListener('click', goToStep1);
+  // Verify email button
+  if (verifyEmailBtn) {
+    verifyEmailBtn.addEventListener('click', async () => {
+      const code = document.getElementById('verificationCode').value.trim();
+
+      if (!code || code.length !== 6) {
+        showError('Please enter the 6-digit verification code');
+        return;
+      }
+
+      try {
+        verifyEmailBtn.disabled = true;
+        verifyEmailBtn.textContent = 'Verifying...';
+
+        const response = await API.auth.verifyEmail(userEmail, code);
+
+        if (response.token) {
+          // Email verified, go to location/language step
+          goToStep(3);
+          showSuccess('Email verified successfully!');
+        }
+      } catch (error) {
+        showError(error.message || 'Invalid verification code');
+      } finally {
+        verifyEmailBtn.disabled = false;
+        verifyEmailBtn.textContent = 'Verify Email';
+      }
+    });
+  }
+
+  // Resend code button
+  if (resendCodeBtn) {
+    resendCodeBtn.addEventListener('click', async () => {
+      try {
+        resendCodeBtn.disabled = true;
+        await API.auth.resendVerification(userEmail);
+        showSuccess('New verification code sent!');
+        setTimeout(() => {
+          resendCodeBtn.disabled = false;
+        }, 30000); // Disable for 30 seconds
+      } catch (error) {
+        showError(error.message || 'Failed to resend code');
+        resendCodeBtn.disabled = false;
+      }
+    });
+  }
+
+  // Back to step 1
+  if (backStep1Btn) {
+    backStep1Btn.addEventListener('click', () => goToStep(1));
   }
 
   // Enable location button
@@ -68,73 +173,11 @@ document.addEventListener('DOMContentLoaded', () => {
     skipLocationStepBtn.addEventListener('click', skipLocation);
   }
 
-  // Form submission
+  // Complete registration
   if (registerForm) {
-    registerForm.addEventListener('submit', async (e) => {
+    registerForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      
-      const name = document.getElementById('name').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
-      const language = document.getElementById('language').value;
-
-      // Validate name
-      if (name.length < 2) {
-        showError('Name must be at least 2 characters long');
-        return;
-      }
-
-      // Validate email
-      if (!validateEmail(email)) {
-        showError('Please enter a valid email address');
-        return;
-      }
-
-      // Check password strength
-      const strength = checkPasswordStrength(password);
-      if (strength.score < 3) {
-        showError('Please use a stronger password (Good or Strong)');
-        return;
-      }
-
-      try {
-        const registerBtn = document.getElementById('registerBtn');
-        registerBtn.disabled = true;
-        registerBtn.textContent = 'Creating account...';
-
-        // Default to India, New Delhi if no location
-        const finalLocation = userLocation || {
-          country: 'IN',
-          state: 'Delhi',
-          city: 'New Delhi',
-          lat: 28.6139,
-          lon: 77.2090
-        };
-
-        const response = await API.auth.register({
-          name,
-          email,
-          password,
-          language,
-          location: finalLocation
-        });
-
-        AppState.setAuth(response.token, response.user);
-        
-        showSuccess('Registration successful! Redirecting...');
-        
-        setTimeout(() => {
-          window.location.href = 'index.html';
-        }, 1500);
-        
-      } catch (error) {
-        showError(error.message || 'Registration failed. Please try again.');
-        const registerBtn = document.getElementById('registerBtn');
-        if (registerBtn) {
-          registerBtn.disabled = false;
-          registerBtn.textContent = 'Create Account';
-        }
-      }
+      window.location.href = 'index.html';
     });
   }
 });
@@ -144,41 +187,11 @@ function validateEmail(email) {
   return re.test(email);
 }
 
-function goToStep1() {
-  currentStep = 1;
-  document.getElementById('step1').classList.remove('hidden');
-  document.getElementById('step2').classList.add('hidden');
-}
-
-function goToStep2() {
-  const name = document.getElementById('name').value.trim();
-  const email = document.getElementById('email').value.trim();
-  const password = document.getElementById('password').value;
-
-  if (!name || name.length < 2) {
-    showError('Please enter a valid name (at least 2 characters)');
-    return;
-  }
-
-  if (!email || !validateEmail(email)) {
-    showError('Please enter a valid email address');
-    return;
-  }
-
-  if (!password) {
-    showError('Please enter a password');
-    return;
-  }
-
-  const strength = checkPasswordStrength(password);
-  if (strength.score < 3) {
-    showError('Please use a stronger password (Good or Strong)');
-    return;
-  }
-
-  currentStep = 2;
-  document.getElementById('step1').classList.add('hidden');
-  document.getElementById('step2').classList.remove('hidden');
+function goToStep(step) {
+  currentStep = step;
+  document.querySelectorAll('.form-step').forEach(el => el.classList.add('hidden'));
+  document.getElementById(`step${step}`).classList.remove('hidden');
+  window.scrollTo(0, 0);
 }
 
 async function requestLocation() {
@@ -196,6 +209,11 @@ async function requestLocation() {
     locationInfo.classList.remove('hidden');
     
     showSuccess('Location enabled successfully!');
+
+    // Update user location
+    if (typeof API !== 'undefined' && AppState.isAuthenticated()) {
+      await API.user.updateLocation(location);
+    }
   } catch (error) {
     console.error('Location error:', error);
     showError('Could not access location. Using default location (New Delhi, India).');
@@ -204,7 +222,6 @@ async function requestLocation() {
 }
 
 function skipLocation() {
-  // Default location: India, New Delhi
   userLocation = {
     country: 'IN',
     state: 'Delhi',

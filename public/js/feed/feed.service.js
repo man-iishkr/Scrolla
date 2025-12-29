@@ -1,5 +1,5 @@
 // public/js/feed/feed.service.js
-// Feed service with working infinite scroll
+// Debug version with extensive logging
 
 const FeedService = {
   currentPage: 1,
@@ -8,6 +8,9 @@ const FeedService = {
   totalLoaded: 0,
 
   async loadFeed(tab = 'main', category = 'all', append = false) {
+    console.log(`\n=== LOADING FEED ===`);
+    console.log(`Tab: ${tab}, Category: ${category}, Append: ${append}`);
+    
     try {
       if (!append) {
         AppState.isLoading = true;
@@ -16,35 +19,42 @@ const FeedService = {
         this.currentPage = 1;
         this.hasMore = true;
         this.totalLoaded = 0;
+        console.log('Starting fresh load...');
       } else {
         if (this.isLoadingMore || !this.hasMore) {
-          console.log('Already loading or no more articles');
+          console.log('⚠ Cannot load more:', { isLoadingMore: this.isLoadingMore, hasMore: this.hasMore });
           return;
         }
         this.isLoadingMore = true;
         showElement('loadingSpinner');
+        console.log('Loading more articles...');
       }
 
+      console.log('Fetching from API...');
       let response;
 
       switch (tab) {
         case 'main':
-          // Home tab shows ALL news
+          console.log('  → Calling API.feed.getMain()');
           response = await API.feed.getMain(category, this.currentPage);
           break;
         case 'national':
+          console.log('  → Calling API.feed.getNational()');
           response = await API.feed.getNational(this.currentPage);
           break;
         case 'international':
+          console.log('  → Calling API.feed.getInternational()');
           response = await API.feed.getInternational(this.currentPage);
           break;
         case 'regional':
           if (!AppState.user?.location?.state) {
             throw new Error('Please enable location to view regional news');
           }
+          console.log('  → Calling API.feed.getRegional()');
           response = await API.feed.getRegional(this.currentPage);
           break;
         case 'saved':
+          console.log('  → Calling API.user.getSavedArticles()');
           response = await API.user.getSavedArticles();
           AppState.savedArticles = response.savedArticles || [];
           response = { articles: AppState.savedArticles };
@@ -54,63 +64,84 @@ const FeedService = {
           if (AppState.isGuest()) {
             throw new Error('Please login to access personalized feed');
           }
+          console.log('  → Calling API.feed.getForYou()');
           response = await API.feed.getForYou(this.currentPage);
           break;
         default:
+          console.log('  → Default: Calling API.feed.getMain()');
           response = await API.feed.getMain(category, this.currentPage);
       }
 
+      console.log('API Response received:', {
+        articlesCount: response.articles?.length || 0,
+        totalResults: response.totalResults
+      });
+
       if (response.articles && response.articles.length > 0) {
+        console.log(`✓ Got ${response.articles.length} articles from API`);
+        
         if (append) {
-          // Filter out duplicates before appending
           const existingIds = new Set(AppState.articles.map(a => a.articleId));
           const newArticles = response.articles.filter(a => !existingIds.has(a.articleId));
           
           if (newArticles.length > 0) {
             AppState.articles = [...AppState.articles, ...newArticles];
             this.totalLoaded += newArticles.length;
-            console.log(`Loaded ${newArticles.length} new articles. Total: ${this.totalLoaded}`);
+            console.log(`✓ Added ${newArticles.length} new articles. Total: ${this.totalLoaded}`);
           } else {
-            console.log('No new unique articles found');
+            console.log('⚠ No new unique articles found');
             this.hasMore = false;
           }
         } else {
-          // Replace articles
           AppState.articles = response.articles;
           AppState.currentArticleIndex = 0;
           this.totalLoaded = response.articles.length;
-          console.log(`Initial load: ${this.totalLoaded} articles`);
+          console.log(`✓ Loaded ${this.totalLoaded} articles into state`);
         }
         
         AppState.currentTab = tab;
         AppState.currentCategory = category;
 
-        // Check if there are more articles to load
-        // If we got fewer than requested (usually 20), there are no more
-        if (response.articles.length < 20) {
+        if (response.articles.length < 30) {
           this.hasMore = false;
-          console.log('No more articles available');
+          console.log('ℹ No more articles available (got less than 30)');
         }
 
-        renderArticles(append);
+        console.log('Calling renderArticles...');
+        console.log('  - renderArticles type:', typeof renderArticles);
         
-        // Show/hide load more button
+        if (typeof renderArticles === 'function') {
+          renderArticles(append);
+          console.log('✓ renderArticles called');
+          
+          // Verify render
+          setTimeout(() => {
+            const container = document.getElementById('newsCards');
+            const cards = container?.querySelectorAll('.news-card');
+            console.log(`✓ Cards in DOM after render: ${cards?.length || 0}`);
+          }, 100);
+        } else {
+          console.error('❌ renderArticles is not a function!');
+        }
+        
         if (this.hasMore && tab !== 'saved') {
           showElement('loadMoreContainer');
         } else {
           hideElement('loadMoreContainer');
         }
       } else {
+        console.warn('⚠ No articles in API response');
         if (!append) {
           showEmptyState(tab);
         }
         this.hasMore = false;
         hideElement('loadMoreContainer');
-        console.log('No articles returned from API');
       }
 
     } catch (error) {
-      console.error('Feed Error:', error);
+      console.error('❌ Feed Error:', error);
+      console.error('Error stack:', error.stack);
+      
       const errorEl = document.getElementById('errorMessage');
       if (errorEl) {
         errorEl.textContent = error.message;
@@ -122,12 +153,13 @@ const FeedService = {
       AppState.isLoading = false;
       this.isLoadingMore = false;
       hideElement('loadingSpinner');
+      console.log('=== FEED LOAD COMPLETE ===\n');
     }
   },
 
   async loadMore() {
     if (this.isLoadingMore || !this.hasMore || AppState.isLoading) {
-      console.log('Cannot load more:', { 
+      console.log('❌ Cannot load more:', { 
         isLoadingMore: this.isLoadingMore, 
         hasMore: this.hasMore,
         isLoading: AppState.isLoading 
@@ -135,7 +167,7 @@ const FeedService = {
       return;
     }
     
-    console.log('Loading more articles... Page:', this.currentPage + 1);
+    console.log('📥 Loading more - Page:', this.currentPage + 1);
     this.currentPage++;
     await this.loadFeed(AppState.currentTab, AppState.currentCategory, true);
   },
@@ -152,7 +184,14 @@ const FeedService = {
 };
 
 function showEmptyState(tab) {
+  console.log('Showing empty state for tab:', tab);
+  
   const container = document.getElementById('newsCards');
+  if (!container) {
+    console.error('Cannot show empty state - container not found');
+    return;
+  }
+  
   const messages = {
     main: 'No news articles available at the moment',
     saved: 'No saved articles yet. Start saving articles you want to read later!',
@@ -172,3 +211,5 @@ function showEmptyState(tab) {
     </div>
   `;
 }
+
+console.log('✓ FeedService loaded');

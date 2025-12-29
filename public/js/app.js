@@ -39,6 +39,20 @@ function setupEventListeners() {
   const signInBtn = document.getElementById('signInBtn');
   if (signInBtn) signInBtn.addEventListener('click', () => window.location.href = 'login.html');
   
+  // Language selector
+  const languageSelect = document.getElementById('languageSelect');
+  if (languageSelect) {
+    // Set current language
+    if (AppState.user?.language) {
+      languageSelect.value = AppState.user.language;
+    }
+    
+    languageSelect.addEventListener('change', async (e) => {
+      const newLanguage = e.target.value;
+      await handleLanguageChange(newLanguage);
+    });
+  }
+  
   // Summary modal
   const closeSummaryBtn = document.getElementById('closeSummaryBtn');
   if (closeSummaryBtn) closeSummaryBtn.addEventListener('click', closeSummaryModal);
@@ -68,6 +82,35 @@ function setupEventListeners() {
   });
 }
 
+async function handleLanguageChange(language) {
+  try {
+    // Update language in backend if user is logged in
+    if (AppState.isAuthenticated() && !AppState.isGuest()) {
+      await API.user.updateLanguage(language);
+    }
+    
+    // Update local state
+    if (AppState.user) {
+      AppState.user.language = language;
+      localStorage.setItem('user', JSON.stringify(AppState.user));
+    }
+    
+    // Reload current tab with new language
+    console.log('Language changed to:', language);
+    showSuccess(`Language changed to ${language === 'hi' ? 'Hindi' : 'English'}`);
+    
+    // Reload feed
+    if (typeof FeedService !== 'undefined') {
+      FeedService.currentPage = 1;
+      FeedService.hasMore = true;
+      await FeedService.loadFeed(AppState.currentTab, AppState.currentCategory);
+    }
+  } catch (error) {
+    console.error('Language change error:', error);
+    showError('Failed to change language');
+  }
+}
+
 async function handleContinueAsGuest() {
   hideElement('authModal');
   showElement('locationModal');
@@ -90,7 +133,15 @@ async function handleRequestLocation() {
 
 async function handleSkipLocation() {
   try {
-    const response = await API.auth.continueAsGuest('en', { country: 'in' });
+    const defaultLocation = {
+      country: 'IN',
+      state: 'Delhi',
+      city: 'New Delhi',
+      lat: 28.6139,
+      lon: 77.2090
+    };
+    
+    const response = await API.auth.continueAsGuest('en', defaultLocation);
     AppState.setAuth(response.token, response.user);
     
     hideElement('locationModal');
@@ -107,11 +158,19 @@ async function initializeApp() {
     // Update auth UI
     updateAuthUI();
 
-    // Setup event listeners
-    setupFeedEvents();
+    // Setup feed events
+    if (typeof setupFeedEvents === 'function') {
+      setupFeedEvents();
+    }
+
+    // Set language selector
+    const languageSelect = document.getElementById('languageSelect');
+    if (languageSelect && AppState.user?.language) {
+      languageSelect.value = AppState.user.language;
+    }
 
     // Load saved articles if authenticated
-    if (!AppState.isGuest()) {
+    if (!AppState.isGuest() && typeof SavedService !== 'undefined') {
       try {
         await SavedService.syncSavedArticles();
       } catch (error) {
@@ -120,7 +179,9 @@ async function initializeApp() {
     }
 
     // Load initial feed
-    await FeedService.loadFeed('main', 'all');
+    if (typeof FeedService !== 'undefined') {
+      await FeedService.loadFeed('main', 'all');
+    }
 
   } catch (error) {
     console.error('App initialization error:', error);
@@ -130,3 +191,4 @@ async function initializeApp() {
 
 // Make functions available globally
 window.initializeApp = initializeApp;
+window.handleLanguageChange = handleLanguageChange;

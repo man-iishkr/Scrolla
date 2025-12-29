@@ -1,5 +1,7 @@
 Logo.png
 node_modules/
+.env
+favicon.svg
 backend/.env
-backend/.env
+backend/node_modules/
 backend/.env

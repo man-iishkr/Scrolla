@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Register - Scrolla</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/auth.css">
 </head>
@@ -64,8 +65,34 @@
           </button>
         </div>
 
-        <!-- Step 2: Location & Language -->
+        <!-- Step 2: Email Verification -->
         <div id="step2" class="form-step hidden">
+          <div class="form-group">
+            <label for="verificationCode">Email Verification Code</label>
+            <p class="help-text">We've sent a 6-digit code to <strong id="emailDisplay"></strong></p>
+            <input 
+              type="text" 
+              id="verificationCode" 
+              name="verificationCode" 
+              placeholder="Enter 6-digit code"
+              maxlength="6"
+              pattern="[0-9]{6}"
+            >
+            <button type="button" class="btn-link" id="resendCodeBtn">Resend Code</button>
+          </div>
+
+          <div class="button-group">
+            <button type="button" class="btn btn-ghost" id="backStep1Btn">
+              Back
+            </button>
+            <button type="button" class="btn btn-primary" id="verifyEmailBtn">
+              Verify Email
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 3: Location & Language -->
+        <div id="step3" class="form-step hidden">
           <div class="form-group">
             <label>Enable Location</label>
             <p class="help-text">Get regional news based on your location</p>
@@ -84,14 +111,9 @@
             </select>
           </div>
 
-          <div class="button-group">
-            <button type="button" class="btn btn-ghost" id="backStepBtn">
-              Back
-            </button>
-            <button type="submit" class="btn btn-primary" id="registerBtn">
-              Create Account
-            </button>
-          </div>
+          <button type="submit" class="btn btn-primary btn-full" id="completeBtn">
+            Complete Registration
+          </button>
         </div>
 
         <div class="error-message hidden" id="errorMessage"></div>
@@ -105,7 +127,6 @@
     </div>
   </div>
 
-  <!-- Load scripts in correct order - state.js FIRST -->
   <script src="js/core/state.js"></script>
   <script src="js/core/utils.js"></script>
   <script src="js/core/api.js"></script>

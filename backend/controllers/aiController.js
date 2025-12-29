@@ -10,7 +10,7 @@ exports.generateSummary = async (req, res) => {
 
     const summary = await aiService.generateSummary(content, title);
 
-    res.json({ summary });
+    res.json({ summary: summary });
   } catch (error) {
     console.error('Summary Error:', error);
     res.status(500).json({ error: 'Failed to generate summary' });
@@ -27,7 +27,7 @@ exports.askAI = async (req, res) => {
 
     const answer = await aiService.askAI(question, articleContext);
 
-    res.json({ answer });
+    res.json({answer:answer});
   } catch (error) {
     console.error('AskAI Error:', error);
     res.status(500).json({ error: 'Failed to get AI response' });
@@ -44,7 +44,7 @@ exports.chat = async (req, res) => {
 
     const response = await aiService.chat(messages);
 
-    res.json({ response });
+    res.send(response);
   } catch (error) {
     console.error('Chat Error:', error);
     res.status(500).json({ error: 'Failed to chat with AI' });
