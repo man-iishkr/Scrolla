@@ -1,23 +1,42 @@
-// backend/models/Article.js
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
-const ArticleSchema = new mongoose.Schema(
-  {
-    title: { type: String, required: true },
-    summary: { type: String, required: true },
-    category: { type: String, default: "General" },
-    topic: { type: String }, // optional finer-grain topic, e.g. "AI agents"
-    sourcesCount: { type: Number, default: 0 },
-    sourceLabel: { type: String },
-    imageUrl: { type: String },
-    url: { type: String }, // link to original article (for later)
-    publishedAt: { type: Date, default: Date.now }
+const articleSchema = new mongoose.Schema({
+  articleId: {
+    type: String,
+    required: true,
+    unique: true
   },
-  {
-    timestamps: true // adds createdAt, updatedAt
+  title: {
+    type: String,
+    required: true
+  },
+  description: String,
+  content: String,
+  url: {
+    type: String,
+    required: true
+  },
+  urlToImage: String,
+  publishedAt: Date,
+  source: {
+    id: String,
+    name: String
+  },
+  author: String,
+  category: String,
+  country: String,
+  language: String,
+  sentiment: String,
+  engagementScore: {
+    type: Number,
+    default: 0
   }
-);
+}, {
+  timestamps: true
+});
 
-const Article = mongoose.model("Article", ArticleSchema);
+articleSchema.index({ publishedAt: -1 });
+articleSchema.index({ category: 1 });
+articleSchema.index({ country: 1 });
 
-module.exports = Article;
+module.exports = mongoose.model('Article', articleSchema);
