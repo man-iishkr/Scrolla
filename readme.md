@@ -108,26 +108,24 @@ In today’s information-rich environment, users often struggle with time constr
 ---
 ## 📁 Project Structure
 scrolla/
-│
 ├── backend/
-│   ├── controllers/
-│   ├── routes/
-│   ├── models/
-│   ├── services/
-│   ├── middlewares/
-│   ├── utils/
-│   └── app.js
+│ ├── controllers/
+│ ├── routes/
+│ ├── models/
+│ ├── services/
+│ ├── middlewares/
+│ ├── utils/
+│ └── app.js
 │
 ├── frontend/
-│   ├── css/
-│   ├── js/
-│   ├── assets/
-│   └── index.html
+│ ├── css/
+│ ├── js/
+│ ├── assets/
+│ └── index.html
 │
 ├── .env
 ├── package.json
 └── README.md
-
 ---
 ## 🔮 Future Enhancements
 
