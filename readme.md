@@ -104,8 +104,9 @@ In today’s information-rich environment, users often struggle with time constr
 │ • Google Gemini AI           │
 │ • Nodemailer (SMTP)          │
 └──────────────────────────────┘
-
-<h2> Project-Structure</h2>
+```
+---
+## 📁 Project Structure
 scrolla/
 │
 ├── backend/
@@ -127,6 +128,7 @@ scrolla/
 ├── package.json
 └── README.md
 
+---
 ## 🔮 Future Enhancements
 
 - Dark mode support  
