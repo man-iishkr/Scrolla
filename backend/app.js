@@ -11,7 +11,7 @@ app.use(express.static(path.join(__dirname, "../public")));
 
 /* API routes */
 app.use("/api/feed", require("./routes/feedRoutes"));
-app.use("/api/auth", require("./routes/authRoutes"));
+app.use("/api/auth", require("./routes/auth_Routes"));
 app.use("/api/user", require("./routes/userRoutes"));
 app.use("/api/ai", require("./routes/aiRoutes"));
 

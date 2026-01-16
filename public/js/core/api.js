@@ -1,5 +1,5 @@
 const API = {
-  baseURL: 'http://localhost:5000/api',
+  baseURL: 'https://scrolla-36ps.onrender.com/api',
 
   // Helper to get auth headers
   getHeaders() {

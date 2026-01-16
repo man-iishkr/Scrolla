@@ -7,7 +7,7 @@ const cors = require('cors');
 const connectDB = require('./config/db');
 
 // Import routes
-const authRoutes = require('./routes/authRoutes');
+const authRoutes = require('./routes/auth_Routes');
 const feedRoutes = require('./routes/feedRoutes');
 const aiRoutes = require('./routes/aiRoutes');
 const userRoutes = require('./routes/userRoutes');
