@@ -2,16 +2,17 @@
 const User = require('../models/user');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
-const SibApiV3Sdk = require('@getbrevo/brevo'); // Using Brevo API SDK
+const Brevo = require('@getbrevo/brevo'); // Updated import
 
 // Store OTPs and verification codes temporarily
 const otpStore = new Map();
 const verificationStore = new Map();
 
-// Initialize Brevo API client
-const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
-const apiKey = SibApiV3Sdk.ApiClient.instance.authentications['api-key'];
-apiKey.apiKey = process.env.BREVO_API_KEY;
+// Initialize Brevo API client correctly
+const apiInstance = new Brevo.TransactionalEmailsApi();
+
+// Correct way to set API Key in the new SDK
+apiInstance.setApiKey(Brevo.TransactionalEmailsApiApiKeys.apiKey, process.env.BREVO_API_KEY);
 
 const generateToken = (userId) => {
   return jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: '30d' });
@@ -34,11 +35,20 @@ exports.register = async (req, res) => {
       expiresAt: Date.now() + 10 * 60 * 1000
     });
 
-    // Send verification email via Brevo API
     try {
-      const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+      const sendSmtpEmail = new Brevo.SendSmtpEmail();
       sendSmtpEmail.subject = "Verify Your Email - Scrolla";
-      sendSmtpEmail.htmlContent = `<html><body><h2>Welcome to Scrolla!</h2><p>Your code: <b>${verificationCode}</b></p></body></html>`;
+      sendSmtpEmail.htmlContent = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2>Welcome to Scrolla!</h2>
+          <p>Thank you for registering. Please verify your email address to complete your registration.</p>
+          <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h1 style="color: #000; margin: 0; text-align: center; font-size: 36px; letter-spacing: 5px;">
+              ${verificationCode}
+            </h1>
+          </div>
+          <p>This code will expire in 10 minutes.</p>
+        </div>`;
       sendSmtpEmail.sender = { "name": "Scrolla", "email": process.env.EMAIL_USER };
       sendSmtpEmail.to = [{ "email": email, "name": name }];
 
@@ -64,7 +74,7 @@ exports.verifyEmail = async (req, res) => {
     const { email, code } = req.body;
     const storedData = verificationStore.get(email);
     if (!storedData || Date.now() > storedData.expiresAt) {
-      return res.status(400).json({ error: 'Code expired or not found' });
+      return res.status(400).json({ error: 'Verification code not found or expired' });
     }
     if (storedData.code !== code) {
       return res.status(400).json({ error: 'Invalid verification code' });
@@ -84,7 +94,7 @@ exports.verifyEmail = async (req, res) => {
     const token = generateToken(user._id);
 
     res.status(201).json({
-      message: 'Email verified successfully',
+      message: 'Email verified and registration successful',
       token,
       user: { id: user._id, name: user.name, email: user.email }
     });
@@ -104,7 +114,7 @@ exports.resendVerificationCode = async (req, res) => {
     storedData.expiresAt = Date.now() + 10 * 60 * 1000;
     verificationStore.set(email, storedData);
 
-    const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+    const sendSmtpEmail = new Brevo.SendSmtpEmail();
     sendSmtpEmail.subject = "New Verification Code - Scrolla";
     sendSmtpEmail.htmlContent = `<html><body><p>New code: <b>${verificationCode}</b></p></body></html>`;
     sendSmtpEmail.sender = { "name": "Scrolla", "email": process.env.EMAIL_USER };
@@ -140,7 +150,7 @@ exports.sendOTP = async (req, res) => {
     const otp = crypto.randomInt(100000, 999999).toString();
     otpStore.set(email, { otp, expiresAt: Date.now() + 5 * 60 * 1000 });
 
-    const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+    const sendSmtpEmail = new Brevo.SendSmtpEmail();
     sendSmtpEmail.subject = "Your Login OTP";
     sendSmtpEmail.htmlContent = `<html><body><p>Your OTP: <b>${otp}</b></p></body></html>`;
     sendSmtpEmail.sender = { "name": "Scrolla", "email": process.env.EMAIL_USER };
@@ -164,7 +174,7 @@ exports.verifyOTP = async (req, res) => {
     otpStore.delete(email);
     const user = await User.findOne({ email });
     const token = generateToken(user._id);
-    res.json({ message: 'OTP verified', token, user: { id: user._id, name: user.name } });
+    res.json({ message: 'OTP verified successfully', token, user: { id: user._id, name: user.name } });
   } catch (error) {
     res.status(500).json({ error: 'OTP verification failed' });
   }
