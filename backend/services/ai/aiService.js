@@ -15,7 +15,7 @@ class AIService {
         throw new Error('Gemini API key not configured');
       }
 
-      const prompt = `Summarize the following news article in 30-50 words. Focus on the key facts and main points. Provide only the summary without any preamble.\n\nTitle: ${title}\n\nArticle: ${articleText}`;
+      const prompt = `Summarize the following news article in 30-50 words. Focus on the key facts and main points. Provide only the summary without any preamble.Provide a concise response between 50 and 70 words. Avoid flowery language, introductory fillers (e.g., 'Here is the info...'), and repetitive phrasing.\n\nTitle: ${title}\n\nArticle: ${articleText}`;
 
       const response = await axios.post(
         `${this.geminiBase}/models/${this.model}:generateContent?key=${this.geminiApiKey}`,
@@ -26,10 +26,11 @@ class AIService {
             }]
           }],
           generationConfig: {
-            temperature: 0.4,
-            maxOutputTokens: 100,
+            temperature: 0.3,
+            maxOutputTokens: 110,
             topP: 0.8,
-            topK: 10
+            topK: 10,
+            stopSequences: ["\n\n\n"]
           }
         },
         {
@@ -70,10 +71,11 @@ class AIService {
             }]
           }],
           generationConfig: {
-            temperature: 0.5,
-            maxOutputTokens: 200,
+            temperature: 0.2,
+            maxOutputTokens: 130,
             topP: 0.8,
-            topK: 40
+            topK: 10,
+            stopSequences: ["\n\n\n"]
           }
         },
         {
@@ -109,10 +111,11 @@ class AIService {
         {
           contents: geminiMessages,
           generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 300,
+            temperature: 0.3,
+            maxOutputTokens: 150,
             topP: 0.9,
-            topK: 40
+            topK: 40,
+            stopSequences: ["\n\n\n"]
           }
         },
         {

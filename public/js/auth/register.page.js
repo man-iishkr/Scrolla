@@ -221,7 +221,7 @@ async function requestLocation() {
   }
 }
 
-function skipLocation() {
+async function skipLocation() { 
   userLocation = {
     country: 'IN',
     state: 'Delhi',
@@ -238,4 +238,21 @@ function skipLocation() {
   locationInfo.classList.remove('hidden');
   
   showSuccess('Using default location: New Delhi, India');
+
+  try {
+    
+    if (typeof API !== 'undefined' && AppState.isAuthenticated()) {
+      await API.user.updateLocation(userLocation);
+    }
+
+    
+    setTimeout(() => {
+      window.location.href = 'index.html';
+    }, 1500);
+
+  } catch (error) {
+    console.error("Failed to save default location", error);
+    
+    window.location.href = 'index.html';
+  }
 }
