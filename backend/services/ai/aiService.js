@@ -33,7 +33,7 @@ ARTICLE TEXT: ${articleText}`;
           }],
           generationConfig: {
             temperature: 0.3,
-            maxOutputTokens: 600,
+            maxOutputTokens: 1000,
             topP: 0.8,
             topK: 10,
             stopSequences: ["\n\n\n"]
@@ -79,7 +79,7 @@ ARTICLE TEXT: ${articleText}`;
           }],
           generationConfig: {
             temperature: 0.2,
-            maxOutputTokens: 800,
+            maxOutputTokens: 1000,
             topP: 0.8,
             topK: 10,
             stopSequences: ["\n\n\n"]
