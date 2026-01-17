@@ -10,6 +10,8 @@ class AIService {
   }
 
   async generateSummary(articleText, title) {
+    console.log("DEBUG: Sending Article Text Length:", articleText?.length);
+    console.log("DEBUG: First 100 chars of text:", articleText?.substring(0, 100));
     try {
       if (!this.geminiApiKey) {
         throw new Error('Gemini API key not configured');
@@ -43,6 +45,7 @@ ARTICLE TEXT: ${articleText}`;
           }
         }
       );
+      console.log("DEBUG: Raw Gemini Response:", JSON.stringify(response.data, null, 2));
 
       const summary = response.data.candidates[0].content.parts[0].text.trim();
       return summary;
